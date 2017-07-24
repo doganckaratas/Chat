@@ -59,5 +59,4 @@ struct database {
    struct database *next;
 } __attribute__((packed));
 
-
 #endif
