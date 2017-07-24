@@ -1,7 +1,7 @@
 # AirChat
 Multithreaded OSI Layer 2 Chat Application (0x1234 protocol parser)
 
-##How to run?
+## How to run?
 First, clone my repository "git clone https://github.com/doganckaratas/Chat.git" 
 After that, run "make clean && make" and "sudo ./chat [interface-name]" 
 
