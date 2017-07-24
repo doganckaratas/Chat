@@ -69,6 +69,11 @@ char username[10],usersurname[10];
 
 int main(int argc, char *argv[])
 {	
+	if (argc > 1)
+		strcpy(ifName, argv[1]);
+	else
+		strcpy(ifName, DEFAULT_IF);
+	
 	init();
 	pthread_t listener,broadcast;
 	pthread_create(&listener,NULL,recvthread,NULL);
@@ -103,11 +108,14 @@ int main(int argc, char *argv[])
 		}
 		else if(strcmp(cmd,"H") == 0 || strcmp(cmd,"h") == 0) {
 			printf("\nHelp Page\n==========================\nQ,q : Shuts down the system and broadcasts exiting message.\nC,c : Enters composer mode\
-			\nH,h: Displays this help message\nL,l : Lists all clients in database\n");
+			\nH,h : Displays this help message\nL,l : Lists all clients in database\nX,x : Clears Screen\n");
 			continue;
 		}
 		else if(strcmp(cmd,"L") == 0 || strcmp(cmd,"l") == 0) {
 			printDatabase();
+		}
+		else if(strcmp(cmd,"X") == 0 || strcmp(cmd,"x") == 0) {
+			system("clear");
 		}
 		else {
 			printf("\nUnknown Command: %s\n",cmd);
@@ -119,7 +127,7 @@ int main(int argc, char *argv[])
 }
 
 void init(void) {
-	strcpy(ifName,DEFAULT_IF);	
+	//strcpy(ifName,DEFAULT_IF);	
 	
 	if ((sockfds = socket(AF_PACKET, SOCK_RAW, IPPROTO_RAW)) == -1) {
 	    perror("socket");
@@ -178,8 +186,6 @@ void* recvthread(void* ptr) {
 			}
 			db = findNS(req_name,req_surname);
 
-			//for(int i = 0; i < 6; i++) printf("%x:",db->mac[i]);
-			//printf(" %s %s\n",db->name,db->surname);		
 		}
 		else if(recvbuf[14] == 0x01) {
 			//printf("unicast\n");
