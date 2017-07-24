@@ -1,4 +1,4 @@
-# Chat
+# AirChat
 Multithreaded OSI Layer 2 Chat Application (0x1234 protocol parser)
 
 ##How to run?
