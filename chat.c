@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <errno.h>
 #include <sys/socket.h>
 #include <linux/if.h>
 #include <linux/if_ether.h>
@@ -335,25 +336,27 @@ void* recvthread(void* ptr) {
 		}
 		else if (recvbuf[14] == 0x08) { // file_query_ucast response ok
 			uint8_t mac[6];
-			memcpy(&mac,recvbuf+6,6);
+			struct file_header* header;
+            memcpy(&mac,recvbuf+6,6);
 			memcpy(&file_name_send,recvbuf+15,32);
 			fill_file_status(&file_status,file_name_send,0x01);
 			send_file_status(mac);
 			// send file to mac immediately
 			
-			FILE fp = fopen((const char*)file_name_send, "r");
+			FILE *fp;
+            fp = fopen((const char*)file_name_send, "r");
 			int file_size;
 			int fragment_count;
 			char* fragment_buffer;
 			int fragsize = 1350;
 			if(!fp){
-				fprintf(stderr, "ERROR: cannot open file %s, errno: %d\n", file_name, errno);
+				fprintf(stderr, "ERROR: cannot open file %s, errno: %d\n", file_name_send, errno);
 				exit(-1);
 			}
 			fseek(fp, 0L, SEEK_END);
 			file_size = ftell(fp);
 			if(file_size <= 0){
-				fprintf(stderr, "ERROR: file length of %s s invalid!!!, errno: %d\n", file_name, errno);
+				fprintf(stderr, "ERROR: file length of %s s invalid!!!, errno: %d\n", file_name_send, errno);
 				exit(-1);
 			}
 			if(fragsize <= 0){
@@ -364,11 +367,11 @@ void* recvthread(void* ptr) {
 				fprintf(stderr, "ERROR: fragment size is bigger than file_size!!!, errno: %d\n", errno);
 				exit(-1);
 			}
-			if(file_size == fragment_size)
+			if(file_size == fragsize)
 				fragment_count = 1;
 			else
-				fragment_count = file_size / fragment_size + 1;
-			fragment_buffer = malloc(fragment_size + sizeof(*header));
+				fragment_count = file_size / fragsize + 1;
+			fragment_buffer = malloc(fragsize + sizeof(*header));
 			if(!fragment_buffer){
 				fprintf(stderr, "memory allocation error!\n");
 				exit(-1);

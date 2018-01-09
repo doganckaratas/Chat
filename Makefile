@@ -3,7 +3,7 @@ CC=gcc
 SRC=chat.c
 TARGET=chat
 
-CFLAGS += -std=gnu99 -Wall -pthread
+CFLAGS += -Wall -pthread
 
 default: $(TARGET)
 
